@@ -1,0 +1,50 @@
+# C/C++ specific
+*.o            # Object files
+*.out          # Executable files
+*.exe          # Windows executables
+*.a            # Static libraries
+*.so           # Shared libraries
+*.d            # Dependency files
+*.class        # Class files
+*.obj          # Object files
+*.pdb          # Debugging files
+*.ilk          # Incremental link files
+*.idb          # Intermediate database files
+*.suo          # Visual Studio user options
+.vscode/       # VS Code settings
+*.vscode/      # VS Code settings folder
+.vs/
+*.vs/
+
+# C# specific
+*.dll          # Dynamic link libraries
+*.exe          # Executable files
+*.user         # Visual Studio user-specific settings
+*.csproj       # C# project files
+bin/           # Build output
+obj/           # Build output
+packages/      # NuGet packages
+*.nupkg        # NuGet packages
+project.lock.json # Project lock file
+*.userprefs    # User preferences
+*.mdb          # Mono debugging files
+
+# Assembly (ASM) specific
+*.lst          # Listing files
+*.bin          # Binary files
+*.hex          # Hexadecimal files
+*.o            # Object files
+
+# OS generated files
+.DS_Store      # macOS file
+Thumbs.db      # Windows file
+*.swp          # Vim swap files
+*.tmp          # Temporary files
+*.log          # Log files
+
+# Backup files
+*~             # Backup files from editors
+
+# Ubuntu files
+*.Identifier
+

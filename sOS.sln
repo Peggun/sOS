@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A40364AA-62E8-4ED4-AE9D-D2B8981BF267}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cs", "cs", "{5AED3B1E-A8BD-426C-9DE3-599FE06D109D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "drivers", "src\cs\drivers\drivers.csproj", "{F406AEA7-0384-4AF0-948C-4D9A02097D0A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F406AEA7-0384-4AF0-948C-4D9A02097D0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F406AEA7-0384-4AF0-948C-4D9A02097D0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F406AEA7-0384-4AF0-948C-4D9A02097D0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F406AEA7-0384-4AF0-948C-4D9A02097D0A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5AED3B1E-A8BD-426C-9DE3-599FE06D109D} = {A40364AA-62E8-4ED4-AE9D-D2B8981BF267}
+		{F406AEA7-0384-4AF0-948C-4D9A02097D0A} = {5AED3B1E-A8BD-426C-9DE3-599FE06D109D}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3502BF22-BF4C-48C8-B1FE-2CDE4907C0EF}
+	EndGlobalSection
+EndGlobal
