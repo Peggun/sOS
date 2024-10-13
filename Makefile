@@ -23,12 +23,18 @@ $(MBR): $(ASM_DIR)/mbr/mbr.asm $(ASM_DIR)/gdt/gdt.asm $(ASM_DIR)/disk/disk.asm $
 	@mkdir -p $(BUILD_DIR)
 	$(NASM) -f bin -o $(MBR) $< -I $(ASM_DIR)/gdt/ -I $(ASM_DIR)/disk/ -I $(ASM_DIR)/switchbitmode/
 
-# Compile kernel
-$(KERNEL): $(KERNEL_DIR)/kernel.c $(VGA_DIR)/vga.c
+# Compile kernel.c into kernel.o
+$(KERNEL_OBJ): $(KERNEL_DIR)/kernel.c
+	$(GCC) -m32 -ffreestanding -nostdlib -fno-pie -v -c $(KERNEL_DIR)/kernel.c -o $(KERNEL_OBJ)
+
+# Compile vga.c into vga.o
+$(VGA_OBJ): $(VGA_DIR)/vga.c
+	$(GCC) -m32 -ffreestanding -nostdlib -fno-pie -v -c $(VGA_DIR)/vga.c -o $(VGA_OBJ)
+
+# Compile and Link Kernel with VGA
+$(KERNEL): $(KERNEL_OBJ) $(VGA_OBJ)
 	@mkdir -p $(BUILD_DIR)
-	$(GCC) -m32 -ffreestanding -nostdlib -fno-pie -c $(KERNEL_DIR)/kernel.c -o $(KERNEL_OBJ)
-	$(GCC) -m32 -ffreestanding -nostdlib -fno-pie -c $(VGA_DIR)/vga.c -o $(VGA_OBJ)
-	$(LD) -m elf_i386 -Ttext 0x1000 --oformat binary -nostdlib -e kernel_main -o $(KERNEL) $(KERNEL_OBJ) $(VGA_OBJ)
+	$(LD) -Ttext 0x1000 --oformat binary -nostdlib -e kernel_main -v -o $(KERNEL) $(KERNEL_OBJ) $(VGA_OBJ)
 
 # GRUB configuration
 $(GRUB_CFG):
@@ -41,18 +47,18 @@ $(GRUB_CFG):
 	echo '}' >> $(GRUB_CFG)
 
 # Create ISO
-$(ISO): $(MBR) $(KERNEL) $(GRUB_CFG)
+$(ISO): $(OS_IMAGE) $(GRUB_CFG)
 	@mkdir -p $(BUILD_DIR)/isodir/boot
 	cp $(KERNEL) $(BUILD_DIR)/isodir/boot/
 	grub-mkrescue -o $@ $(BUILD_DIR)/isodir
 
-# Create image for testing for now. 
+# Create image for testing for now. Which works better than the ISO....
 $(OS_IMAGE): $(MBR) $(KERNEL)
 	cat $^ > $@
 
-# Run in QEMU
+# Run in QEMU 
 run: $(P)
-	$(QEMU) -fda $(OS_IMAGE)
+	$(QEMU) -fda $(OS_IMAGE) -boot d -d int,cpu_reset,exec -serial stdio -debugcon file:logs/debug.log
 
 # Clean
 clean:

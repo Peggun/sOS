@@ -11,8 +11,10 @@ mov [BOOT_DRIVE], dl
 mov bp, 0x9000
 mov sp, bp
 
-call load_kernel
-call switch_to_32bit
+_start:
+    mov al, 'K'
+    call load_kernel
+    call switch_to_32bit
 
 jmp $
 
