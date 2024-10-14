@@ -12,6 +12,8 @@ GRUB_CFG = $(BUILD_DIR)/isodir/boot/grub/grub.cfg
 KERNEL = $(BUILD_DIR)/kernel.bin
 KERNEL_OBJ = $(BUILD_DIR)/kernel.o
 VGA_OBJ = $(BUILD_DIR)/vga.o
+CURSOR_OBJ = $(BUILD_DIR)/cursor.o
+PORT_OBJ = $(BUILD_DIR)/port.o
 MBR = $(BUILD_DIR)/mbr.bin
 OS_IMAGE = $(BUILD_DIR)/os-image.bin
 
@@ -25,16 +27,24 @@ $(MBR): $(ASM_DIR)/mbr/mbr.asm $(ASM_DIR)/gdt/gdt.asm $(ASM_DIR)/disk/disk.asm $
 
 # Compile kernel.c into kernel.o
 $(KERNEL_OBJ): $(KERNEL_DIR)/kernel.c
-	$(GCC) -m32 -ffreestanding -nostdlib -fno-pie -v -c $(KERNEL_DIR)/kernel.c -o $(KERNEL_OBJ)
+	$(GCC) -m32 -ffreestanding -nostdlib -fno-pie -c $(KERNEL_DIR)/kernel.c -o $(KERNEL_OBJ)
 
 # Compile vga.c into vga.o
-$(VGA_OBJ): $(VGA_DIR)/vga.c
-	$(GCC) -m32 -ffreestanding -nostdlib -fno-pie -v -c $(VGA_DIR)/vga.c -o $(VGA_OBJ)
+$(VGA_OBJ): $(VGA_DIR)/vga.c $(VGA_DIR)/cursor.h
+	$(GCC) -m32 -ffreestanding -nostdlib -fno-pie -c $(VGA_DIR)/vga.c -o $(VGA_OBJ)
 
-# Compile and Link Kernel with VGA
-$(KERNEL): $(KERNEL_OBJ) $(VGA_OBJ)
+# Compile cursor.c into cursor.o
+$(CURSOR_OBJ): $(VGA_DIR)/cursor.c $(VGA_DIR)/ports.c
+	$(GCC) -m32 -ffreestanding -nostdlib -fno-pie -c $(VGA_DIR)/cursor.c -o $(CURSOR_OBJ)
+
+# Compile ports.c into port.o
+$(PORT_OBJ): $(VGA_DIR)/ports.c
+	$(GCC) -m32 -ffreestanding -nostdlib -fno-pie -c $(VGA_DIR)/ports.c -o $(PORT_OBJ)
+
+# Link Kernel with VGA, Cursor, and Port
+$(KERNEL): $(KERNEL_OBJ) $(VGA_OBJ) $(CURSOR_OBJ) $(PORT_OBJ)
 	@mkdir -p $(BUILD_DIR)
-	$(LD) -Ttext 0x1000 --oformat binary -nostdlib -e kernel_main -v -o $(KERNEL) $(KERNEL_OBJ) $(VGA_OBJ)
+	$(LD) -Ttext 0x1000 --oformat binary -nostdlib -e kernel_main -o $(KERNEL) $(KERNEL_OBJ) $(VGA_OBJ) $(CURSOR_OBJ) $(PORT_OBJ)
 
 # GRUB configuration
 $(GRUB_CFG):
@@ -52,12 +62,12 @@ $(ISO): $(OS_IMAGE) $(GRUB_CFG)
 	cp $(KERNEL) $(BUILD_DIR)/isodir/boot/
 	grub-mkrescue -o $@ $(BUILD_DIR)/isodir
 
-# Create image for testing for now. Which works better than the ISO....
+# Create image for testing
 $(OS_IMAGE): $(MBR) $(KERNEL)
 	cat $^ > $@
 
 # Run in QEMU 
-run: $(P)
+run: $(OS_IMAGE)
 	$(QEMU) -fda $(OS_IMAGE) -boot d -d int,cpu_reset,exec -serial stdio -debugcon file:logs/debug.log
 
 # Clean

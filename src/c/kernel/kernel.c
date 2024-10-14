@@ -1,7 +1,10 @@
+// NOTE: after some testing, it turns out with the welcomeMsg[] you can only print it out 13 times before it breaks. Fun fact. Before I increase the storage allowed.
+
 #include "../drivers/vga/vga.h"
+#include "../drivers/vga/cursor.h"
 
 void kernel_main() {
     clear_screen();
-    print_char('a', WHITE_ON_BLACK);
-    print_string("Hello, OS!");
+    char welcomeMsg[] = "Welcome to sOS!\n";
+    print_string(welcomeMsg);
 }
