@@ -8,10 +8,11 @@ void print_char(char c, int offset) {
 }
 
 // ok. time to fix you now.
-void print_string(char *str) {
+void print_string(const char *str) {
     int offset = get_cursor();
     int i = 0;
-    while (str[i] != 0) {
+    while (str[i] != 0)
+    {
         if (str[i] == '\n') {
             offset = move_offset_to_new_line(offset);
         } else {
@@ -61,4 +62,18 @@ int scroll_ln(int offset) {
     }
 
     return offset - 2 * VGA_WIDTH;
+}
+
+void print_backspace() {
+    int newCursor = get_cursor() - 2;
+    print_char(' ', newCursor);
+    set_cursor(newCursor);
+}
+
+void print_nl() {
+    int newOffset = move_offset_to_new_line(get_cursor());
+    if (newOffset >= VGA_HEIGHT * VGA_WIDTH * 2) {
+        newOffset = scroll_ln(newOffset);
+    }
+    set_cursor(newOffset);
 }

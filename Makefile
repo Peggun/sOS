@@ -7,6 +7,7 @@ BUILD_DIR = build
 ASM_DIR = src/asm
 KERNEL_DIR = src/c/kernel
 VGA_DIR = src/c/drivers/vga
+KEYBOARD_DIR = src/c/drivers/keyboard
 ISO = $(BUILD_DIR)/boot.iso
 GRUB_CFG = $(BUILD_DIR)/isodir/boot/grub/grub.cfg
 KERNEL = $(BUILD_DIR)/kernel.bin
@@ -14,6 +15,11 @@ KERNEL_OBJ = $(BUILD_DIR)/kernel.o
 VGA_OBJ = $(BUILD_DIR)/vga.o
 CURSOR_OBJ = $(BUILD_DIR)/cursor.o
 PORT_OBJ = $(BUILD_DIR)/port.o
+ISR_OBJ = $(BUILD_DIR)/isr.o
+IDT_OBJ = $(BUILD_DIR)/idt.o
+KEYBOARD_OBJ = $(BUILD_DIR)/keyboard.o
+UTIL_OBJ = $(BUILD_DIR)/util.o
+INTERRUPT_OBJ = $(BUILD_DIR)/interrupt.o
 MBR = $(BUILD_DIR)/mbr.bin
 OS_IMAGE = $(BUILD_DIR)/os-image.bin
 
@@ -21,9 +27,9 @@ OS_IMAGE = $(BUILD_DIR)/os-image.bin
 all: $(ISO) $(OS_IMAGE)
 
 # Compile MBR
-$(MBR): $(ASM_DIR)/mbr/mbr.asm $(ASM_DIR)/gdt/gdt.asm $(ASM_DIR)/disk/disk.asm $(ASM_DIR)/switchbitmode/switch-to-32bit.asm
+$(MBR): $(ASM_DIR)/mbr.asm $(ASM_DIR)/gdt.asm $(ASM_DIR)/disk.asm $(ASM_DIR)/switch-to-32bit.asm $(ASM_DIR)/print-16bit.asm $(ASM_DIR)/print-32bit.asm
 	@mkdir -p $(BUILD_DIR)
-	$(NASM) -f bin -o $(MBR) $< -I $(ASM_DIR)/gdt/ -I $(ASM_DIR)/disk/ -I $(ASM_DIR)/switchbitmode/
+	$(NASM) -f bin -o $(MBR) $< -I $(ASM_DIR)
 
 # Compile kernel.c into kernel.o
 $(KERNEL_OBJ): $(KERNEL_DIR)/kernel.c
@@ -41,10 +47,30 @@ $(CURSOR_OBJ): $(VGA_DIR)/cursor.c $(VGA_DIR)/ports.c
 $(PORT_OBJ): $(VGA_DIR)/ports.c
 	$(GCC) -m32 -ffreestanding -nostdlib -fno-pie -c $(VGA_DIR)/ports.c -o $(PORT_OBJ)
 
-# Link Kernel with VGA, Cursor, and Port
-$(KERNEL): $(KERNEL_OBJ) $(VGA_OBJ) $(CURSOR_OBJ) $(PORT_OBJ)
+# Compile isr.c into isr.o
+$(ISR_OBJ): $(KERNEL_DIR)/isr.c $(KERNEL_DIR)/isr.h $(KERNEL_DIR)/idt.h $(VGA_DIR)/ports.h
+	$(GCC) -m32 -ffreestanding -nostdlib -fno-pie -c $(KERNEL_DIR)/isr.c -o $(ISR_OBJ)
+
+# Compile idt.c into idt.o
+$(IDT_OBJ): $(KERNEL_DIR)/idt.c $(KERNEL_DIR)/idt.h
+	$(GCC) -m32 -ffreestanding -nostdlib -fno-pie -c $(KERNEL_DIR)/idt.c -o $(IDT_OBJ)
+
+# Compile keyboard.c into keyboard.o
+$(KEYBOARD_OBJ): $(KEYBOARD_DIR)/keyboard.c $(KERNEL_DIR)/isr.h $(KERNEL_DIR)/idt.h $(VGA_DIR)/ports.h
+	$(GCC) -m32 -ffreestanding -nostdlib -fno-pie -c $(KEYBOARD_DIR)/keyboard.c -o $(KEYBOARD_OBJ)
+
+# Compile util.c into util.o
+$(UTIL_OBJ): $(KERNEL_DIR)/util.c
+	$(GCC) -m32 -ffreestanding -nostdlib -fno-pie -c $(KERNEL_DIR)/util.c -o $(UTIL_OBJ)
+
+# Compile interrupt.asm into interrupt.o
+$(INTERRUPT_OBJ): $(KERNEL_DIR)/interrupt.asm
+	$(NASM) -f elf32 -o $(INTERRUPT_OBJ) $(KERNEL_DIR)/interrupt.asm
+
+# Link Kernel with all object files
+$(KERNEL): $(KERNEL_OBJ) $(VGA_OBJ) $(CURSOR_OBJ) $(PORT_OBJ) $(ISR_OBJ) $(IDT_OBJ) $(KEYBOARD_OBJ) $(UTIL_OBJ) $(INTERRUPT_OBJ)
 	@mkdir -p $(BUILD_DIR)
-	$(LD) -Ttext 0x1000 --oformat binary -nostdlib -e kernel_main -o $(KERNEL) $(KERNEL_OBJ) $(VGA_OBJ) $(CURSOR_OBJ) $(PORT_OBJ)
+	$(LD) -Ttext 0x1000 --oformat binary -nostdlib -e kernel_main -o $(KERNEL) $(KERNEL_OBJ) $(VGA_OBJ) $(CURSOR_OBJ) $(PORT_OBJ) $(ISR_OBJ) $(IDT_OBJ) $(KEYBOARD_OBJ) $(UTIL_OBJ) $(INTERRUPT_OBJ)
 
 # GRUB configuration
 $(GRUB_CFG):
@@ -68,7 +94,7 @@ $(OS_IMAGE): $(MBR) $(KERNEL)
 
 # Run in QEMU 
 run: $(OS_IMAGE)
-	$(QEMU) -fda $(OS_IMAGE) -boot d -d int,cpu_reset,exec -serial stdio -debugcon file:logs/debug.log
+	$(QEMU) -fda $(OS_IMAGE) -d guest_errors,int,cpu_reset &
 
 # Clean
 clean:

@@ -10,9 +10,20 @@ If you would like to join me in this journey, please feel free.
 
 # Journey Updates!
 
-Update 1: I managed to find a tutorial for a bootloader.asm that prints hello world to the screen, and it works!
+## Update 1: 
+I managed to find a tutorial for a bootloader.asm that prints hello world to the screen, and it works!
 
-Update 2: I have tried to add a kernel with a vga driver that I found which is going well (not). With some AI magic and hours wasted hopefully it should be fixed soon! I have found this website and I'm working around it https://dev.to/frosnerd/writing-my-own-boot-loader-3mld.
+## Update 2: 
+I have tried to add a kernel with a vga driver that I found which is going well (not). With some AI magic and hours wasted hopefully it should be fixed soon! I have found this website and I'm working around it https://dev.to/frosnerd/writing-my-own-boot-loader-3mld.
 ![alt text](image.png)
 
-Update 3: After somewhat following that guide and rebuilding my bootloader, It's all going well! I really recommend that website because it tells you all about what the file does! Next, back to the VGA Driver!
+## Update 3: 
+After somewhat following that guide and rebuilding my bootloader, It's all going well! I really recommend that website because it tells you all about what the file does! Next, back to the VGA Driver!
+
+## Update 4: 
+After around 3-4 days of debugging, i finally decided to go on GitHub source code for that article and borrow indefinitely the bootloader code. And it all finally works. The VGA driver in finished and works fine. `print_string()` finally allows this `print_string("Hello, World")` instead of just this, 
+```c
+char string[] = "Hello, World!";
+print_string(string);
+```
+And the keyboard driver works now too! Horray!

@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "*.py": "python",
-        "vga.h": "c"
+        "vga.h": "c",
+        "idt.h": "c",
+        "isr.h": "c"
     }
 }
