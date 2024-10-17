@@ -27,3 +27,7 @@ char string[] = "Hello, World!";
 print_string(string);
 ```
 And the keyboard driver works now too! Horray!
+
+## Update 5:
+I have now finished the Shell aspect of my operating system. You can use the HELP command to see the available commands.
+It's now time to move to the last part of the tutorial before I am on my own. Dynamic Memory Management.

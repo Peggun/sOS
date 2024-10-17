@@ -1,3 +1,6 @@
+#include <stdint.h>
+#include <stdbool.h>
+
 int string_length(char s[]) {
     int i = 0;
     while (s[i] != '\0') ++i;
@@ -25,4 +28,28 @@ void int_to_string(int n, char str[]) {
     str[i] = '\0';
 
     reverse(str);
+}
+
+void append(char s[], char n) {
+    int len = string_length(s);
+    s[len] = n;
+    s[len+1] = '\0';
+}
+
+bool backspace(char s[]) {
+    int len = string_length(s);
+    if (len > 0) {
+        s[len - 1] = '\0';
+        return true;
+    } else {
+        return false;
+    }
+}
+
+int compare_string(const char s1[], const char s2[]) {
+    int i;
+    for (i = 0; s1[i] == s2[i]; i++) {
+        if (s1[i] == '\0') return 0;
+    }
+    return s1[i] - s2[i];
 }

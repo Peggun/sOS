@@ -43,13 +43,6 @@ int move_offset_to_new_line(int offset) {
     return get_offset(0, get_row_from_offset(offset) + 1);
 }
 
-void memory_copy(char *source, char *dest, int nbytes) {
-    int i;
-    for (i = 0; i < nbytes; i++) {
-        *(dest + i) = *(source + i);
-    }
-}
-
 int scroll_ln(int offset) {
     memory_copy(
             (char *) (get_offset(0, 1) + VGA_ADDRESS),
@@ -68,6 +61,13 @@ void print_backspace() {
     int newCursor = get_cursor() - 2;
     print_char(' ', newCursor);
     set_cursor(newCursor);
+}
+
+void memory_copy(char *source, char *dest, int nbytes) {
+    int i;
+    for (i = 0; i < nbytes; i++) {
+        *(dest + i) = *(source + i);
+    }
 }
 
 void print_nl() {

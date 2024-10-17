@@ -3,6 +3,7 @@
         "*.py": "python",
         "vga.h": "c",
         "idt.h": "c",
-        "isr.h": "c"
+        "isr.h": "c",
+        "cmds.h": "c"
     }
 }

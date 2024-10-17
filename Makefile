@@ -22,6 +22,7 @@ UTIL_OBJ = $(BUILD_DIR)/util.o
 INTERRUPT_OBJ = $(BUILD_DIR)/interrupt.o
 MBR = $(BUILD_DIR)/mbr.bin
 OS_IMAGE = $(BUILD_DIR)/os-image.bin
+CMDS_OBJ = $(BUILD_DIR)/cmds.o
 
 # Default target
 all: $(ISO) $(OS_IMAGE)
@@ -67,10 +68,14 @@ $(UTIL_OBJ): $(KERNEL_DIR)/util.c
 $(INTERRUPT_OBJ): $(KERNEL_DIR)/interrupt.asm
 	$(NASM) -f elf32 -o $(INTERRUPT_OBJ) $(KERNEL_DIR)/interrupt.asm
 
+# Compile util.c into util.o
+$(CMDS_OBJ): $(KERNEL_DIR)/cmds.c
+	$(GCC) -m32 -ffreestanding -nostdlib -fno-pie -c $(KERNEL_DIR)/cmds.c -o $(CMDS_OBJ)
+
 # Link Kernel with all object files
-$(KERNEL): $(KERNEL_OBJ) $(VGA_OBJ) $(CURSOR_OBJ) $(PORT_OBJ) $(ISR_OBJ) $(IDT_OBJ) $(KEYBOARD_OBJ) $(UTIL_OBJ) $(INTERRUPT_OBJ)
+$(KERNEL): $(KERNEL_OBJ) $(VGA_OBJ) $(CURSOR_OBJ) $(PORT_OBJ) $(ISR_OBJ) $(IDT_OBJ) $(KEYBOARD_OBJ) $(UTIL_OBJ) $(INTERRUPT_OBJ) $(CMDS_OBJ)
 	@mkdir -p $(BUILD_DIR)
-	$(LD) -Ttext 0x1000 --oformat binary -nostdlib -e kernel_main -o $(KERNEL) $(KERNEL_OBJ) $(VGA_OBJ) $(CURSOR_OBJ) $(PORT_OBJ) $(ISR_OBJ) $(IDT_OBJ) $(KEYBOARD_OBJ) $(UTIL_OBJ) $(INTERRUPT_OBJ)
+	$(LD) -Ttext 0x1000 --oformat binary -nostdlib -e kernel_main -o $(KERNEL) $(KERNEL_OBJ) $(VGA_OBJ) $(CURSOR_OBJ) $(PORT_OBJ) $(ISR_OBJ) $(IDT_OBJ) $(KEYBOARD_OBJ) $(UTIL_OBJ) $(INTERRUPT_OBJ) $(CMDS_OBJ)
 
 # GRUB configuration
 $(GRUB_CFG):

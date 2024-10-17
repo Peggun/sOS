@@ -23,9 +23,9 @@ void clear_screen(void);
 int get_offset(int col, int row);
 int get_row_from_offset(int offset);
 int move_offset_to_new_line(int offset);
-void memory_copy(char *source, char *dest, int nbytes);
 int scroll_ln(int offset);
 void print_backspace();
 void print_nl();
+void memory_copy(char *source, char *dest, int nbytes);
 
 #endif
