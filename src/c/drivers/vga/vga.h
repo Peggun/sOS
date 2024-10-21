@@ -28,4 +28,7 @@ void print_backspace();
 void print_nl();
 void memory_copy(char *source, char *dest, int nbytes);
 
+void print_hex_digit(unsigned char digit);
+void print_hex(uint32_t num);
+
 #endif

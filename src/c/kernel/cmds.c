@@ -23,6 +23,7 @@ void help_command(int argc, char *argv[]) {
     print_string(" - HELP: Displays this help message.\n");
     print_string(" - CLEAR: Clears the screen.\n");
     print_string(" - ECHO: Writes to the screen.\n");
+    //print_string(" - DT: Disk test.\n");
     print_nl();
 }
 
@@ -35,5 +36,6 @@ Command command_table[] = {
     {"HELP", help_command},
     {"ECHO", echo_command},
     {"CLEAR", clear_command},
+    //{"DT", dt_command},
     {NULL, NULL}  // Null terminator
 };

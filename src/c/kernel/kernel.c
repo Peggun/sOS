@@ -5,10 +5,12 @@
 #include "util.h"
 #include "cmds.h"
 #include "kernel.h"
+#include "../drivers/disk/disk.h"
+#include "../fs/ext2.h"
 
 void kernel_main() {
     clear_screen();
-    print_string("Installing interrupt service routines (ISRs).");
+    print_string("Installing interrupt service routines (ISRs).\n");
     isr_install();
 
     print_string("Enabling external interrupts.\n");
@@ -17,8 +19,21 @@ void kernel_main() {
     print_string("Initializing keyboard (IRQ 1).\n");
     init_keyboard();
 
+    print_string("Initializing disk.\n");
+    if (!disk_init()) {
+        print_string("Disk initialization failed!\n");
+        return;
+    }
+    else
+    {
+        print_string("Disk initialized successfully.\n");
+    }
+
+    print_string("Mounting ext2 filesystem.\n");
+    ext2_mount();  // Mount the ext2 filesystem
+
     clear_screen();
-    print_string("test@sOS: >");
+    print_string("test@sOS: > ");
 }
 
 void parse_input(char *input, char *argv[], int *argc) {
