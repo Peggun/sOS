@@ -31,3 +31,6 @@ And the keyboard driver works now too! Horray!
 ## Update 5:
 I have now finished the Shell aspect of my operating system. You can use the HELP command to see the available commands.
 It's now time to move to the last part of the tutorial before I am on my own. Dynamic Memory Management.
+
+## Update 6:
+I have chosen to start working on the Filesystem for sOS over the DMM. I plan to be using a EXT2 filesystem structure. This is now being developed as you read. Everything has been going fine so far, with a few hiccups.
