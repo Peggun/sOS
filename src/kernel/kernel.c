@@ -5,6 +5,7 @@
 #include "../include/util.h"
 #include "../include/cmds.h"
 #include "../include/kernel.h"
+#include "../include/ctype.h"
 
 void kernel_main() {
     clear_screen();
@@ -49,9 +50,12 @@ void execute_command(char *input) {
         return;
     }
 
+    // Convert the command to lowercase
+    strToLower(argv[0]);
+
     // Iterate over the command table to find the matching command
     for (int i = 0; command_table[i].name != NULL; i++) {
-        // Use compare_string to check for a match
+        // Use compare_string to check for a match (commands are already lowercase)
         if (compare_string(argv[0], command_table[i].name) == 0) {
             // Execute the command function with arguments
             command_table[i].func(argc, argv);

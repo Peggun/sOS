@@ -31,6 +31,7 @@ OS_IMAGE = $(BUILD_DIR)/os-image.bin
 INCLUDE_DIR = src/include
 COMMON_DIR = src/kernel/common
 DESC_TABLE_DIR = src/kernel/descriptor_tables
+LIB_DIR = src/lib
 
 # Default target
 all: $(ISO) $(OS_IMAGE)
@@ -80,11 +81,13 @@ $(INTERRUPT_OBJ): $(KERNEL_DIR)/interrupt/interrupt.asm
 $(CMDS_OBJ): $(KERNEL_DIR)/commands/cmds.c
 	$(GCC) -m32 -ffreestanding  -fno-pie -c $(KERNEL_DIR)/commands/cmds.c -o $(CMDS_OBJ)
 
+$(BUILD_DIR)/ctype.o: $(LIB_DIR)/ctype.c
+	$(GCC) -m32 -ffreestanding  -fno-pie -c $(LIB_DIR)/ctype.c -o $(BUILD_DIR)/ctype.o
 
 # Link Kernel with all object files
-$(KERNEL): $(KERNEL_OBJ) $(VGA_OBJ) $(CURSOR_OBJ) $(PORT_OBJ) $(ISR_OBJ) $(IDT_OBJ) $(KEYBOARD_OBJ) $(UTIL_OBJ) $(INTERRUPT_OBJ) $(CMDS_OBJ)
+$(KERNEL): $(KERNEL_OBJ) $(VGA_OBJ) $(CURSOR_OBJ) $(PORT_OBJ) $(ISR_OBJ) $(IDT_OBJ) $(KEYBOARD_OBJ) $(UTIL_OBJ) $(INTERRUPT_OBJ) $(CMDS_OBJ) $(BUILD_DIR)/ctype.o 
 	@mkdir -p $(BUILD_DIR)
-	$(LD) -Ttext 0x1000 --oformat binary -e kernel_main -o $(KERNEL) $(KERNEL_OBJ) $(VGA_OBJ) $(CURSOR_OBJ) $(PORT_OBJ) $(ISR_OBJ) $(IDT_OBJ) $(KEYBOARD_OBJ) $(UTIL_OBJ) $(INTERRUPT_OBJ) $(CMDS_OBJ)
+	$(LD) -Ttext 0x1000 --oformat binary -e kernel_main -o $(KERNEL) $(KERNEL_OBJ) $(VGA_OBJ) $(CURSOR_OBJ) $(PORT_OBJ) $(ISR_OBJ) $(IDT_OBJ) $(KEYBOARD_OBJ) $(UTIL_OBJ) $(INTERRUPT_OBJ) $(CMDS_OBJ) $(BUILD_DIR)/ctype.o
 
 # GRUB configuration
 $(GRUB_CFG):
