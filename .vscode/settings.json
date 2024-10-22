@@ -4,6 +4,9 @@
         "vga.h": "c",
         "idt.h": "c",
         "isr.h": "c",
-        "cmds.h": "c"
+        "cmds.h": "c",
+        "ext2.h": "c",
+        "util.h": "c",
+        "stdint.h": "c"
     }
 }
