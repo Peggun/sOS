@@ -8,6 +8,8 @@ LOADER_DIR = src/kernel/loader
 KERNEL_DIR = src/kernel
 VGA_DIR = src/kernel/drivers/vga
 KEYBOARD_DIR = src/kernel/drivers/keyboard
+ATA_DIR = src/kernel/drivers/ata
+DISK_DIR = src/kernel/drivers/disk
 ISO = $(BUILD_DIR)/boot.iso
 GRUB_CFG = $(BUILD_DIR)/isodir/boot/grub/grub.cfg
 KERNEL = $(BUILD_DIR)/kernel.bin
@@ -32,6 +34,7 @@ INCLUDE_DIR = src/include
 COMMON_DIR = src/kernel/common
 DESC_TABLE_DIR = src/kernel/descriptor_tables
 LIB_DIR = src/lib
+FS_DIR = src/kernel/filesystem
 
 # Default target
 all: $(ISO) $(OS_IMAGE)
@@ -84,10 +87,19 @@ $(CMDS_OBJ): $(KERNEL_DIR)/commands/cmds.c
 $(BUILD_DIR)/ctype.o: $(LIB_DIR)/ctype.c
 	$(GCC) -m32 -ffreestanding  -fno-pie -c $(LIB_DIR)/ctype.c -o $(BUILD_DIR)/ctype.o
 
+$(BUILD_DIR)/ata.o: $(ATA_DIR)/ata.c
+	$(GCC) -m32 -ffreestanding  -fno-pie -c $(ATA_DIR)/ata.c -o $(BUILD_DIR)/ata.o
+
+$(BUILD_DIR)/disk.o: $(DISK_DIR)/disk.c
+	$(GCC) -m32 -ffreestanding  -fno-pie -c $(DISK_DIR)/disk.c -o $(BUILD_DIR)/disk.o
+
+$(BUILD_DIR)/ext2.o: $(FS_DIR)/ext2.c
+	$(GCC) -m32 -ffreestanding  -fno-pie -c $(FS_DIR)/ext2.c -o $(BUILD_DIR)/ext2.o
+
 # Link Kernel with all object files
-$(KERNEL): $(KERNEL_OBJ) $(VGA_OBJ) $(CURSOR_OBJ) $(PORT_OBJ) $(ISR_OBJ) $(IDT_OBJ) $(KEYBOARD_OBJ) $(UTIL_OBJ) $(INTERRUPT_OBJ) $(CMDS_OBJ) $(BUILD_DIR)/ctype.o 
+$(KERNEL): $(KERNEL_OBJ) $(VGA_OBJ) $(CURSOR_OBJ) $(PORT_OBJ) $(ISR_OBJ) $(IDT_OBJ) $(KEYBOARD_OBJ) $(UTIL_OBJ) $(INTERRUPT_OBJ) $(CMDS_OBJ) $(BUILD_DIR)/ctype.o $(BUILD_DIR)/ata.o $(BUILD_DIR)/disk.o $(BUILD_DIR)/ext2.o
 	@mkdir -p $(BUILD_DIR)
-	$(LD) -Ttext 0x1000 --oformat binary -e kernel_main -o $(KERNEL) $(KERNEL_OBJ) $(VGA_OBJ) $(CURSOR_OBJ) $(PORT_OBJ) $(ISR_OBJ) $(IDT_OBJ) $(KEYBOARD_OBJ) $(UTIL_OBJ) $(INTERRUPT_OBJ) $(CMDS_OBJ) $(BUILD_DIR)/ctype.o
+	$(LD) -Ttext 0x1000 --oformat binary -e kernel_main -o $(KERNEL) $(KERNEL_OBJ) $(VGA_OBJ) $(CURSOR_OBJ) $(PORT_OBJ) $(ISR_OBJ) $(IDT_OBJ) $(KEYBOARD_OBJ) $(UTIL_OBJ) $(INTERRUPT_OBJ) $(CMDS_OBJ) $(BUILD_DIR)/ctype.o $(BUILD_DIR)/ata.o $(BUILD_DIR)/disk.o $(BUILD_DIR)/ext2.o
 
 # GRUB configuration
 $(GRUB_CFG):
@@ -109,8 +121,8 @@ $(ISO): $(OS_IMAGE) $(GRUB_CFG)
 $(OS_IMAGE): $(MBR) $(KERNEL)
 	cat $^ > $@
 
+# Create image for testing with a root directory
 $(BUILD_DIR)/disk.img:
-#qemu-img create -f raw $(BUILD_DIR)/disk.img 64M
 	dd if=/dev/zero of=$(BUILD_DIR)/disk.img bs=1M count=16
 	mkfs.ext2 $(BUILD_DIR)/disk.img
 

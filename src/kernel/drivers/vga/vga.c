@@ -1,5 +1,6 @@
 #include "../../../include/vga.h"
 #include "../../../include/cursor.h"
+#include "../../../include/stddef.h"
 
 void print_char(char c, int offset) {
     unsigned char *vidmem = (unsigned char *)VGA_ADDRESS;
@@ -59,6 +60,17 @@ void print_hex(uint32_t num) {
     }
     
     print_nl();  // Newline for better formatting
+}
+
+void print_buffer(uint8_t *buffer, size_t size) {
+    for (size_t i = 0; i < size; i++) {
+        if (i % 16 == 0) {
+            print_string("\n");  // New line for every 16 bytes
+        }
+        print_hex(buffer[i]);
+        print_string(" ");
+    }
+    print_string("\n");
 }
 
 void clear_screen(void) {

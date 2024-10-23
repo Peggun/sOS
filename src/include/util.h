@@ -15,3 +15,5 @@ bool backspace(char s[]);
 void append(char s[], char n);
 
 int compare_string(const char s1[], const char s2[]);
+
+void itoa(int value, char *str, int base);

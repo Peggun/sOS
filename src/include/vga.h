@@ -4,6 +4,7 @@
 #define VGA_H
 
 #include <stdint.h>
+#include <stddef.h>
 
 #define VGA_ADDRESS 0xB8000
 #define VGA_WIDTH 80
@@ -30,5 +31,7 @@ void memory_copy(char *source, char *dest, int nbytes);
 
 void print_hex_digit(unsigned char digit);
 void print_hex(uint32_t num);
+
+void print_buffer(uint8_t *buffer, size_t size);
 
 #endif

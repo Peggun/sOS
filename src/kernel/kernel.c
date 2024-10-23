@@ -6,9 +6,15 @@
 #include "../include/cmds.h"
 #include "../include/kernel.h"
 #include "../include/ctype.h"
+#include "../include/ext2.h"
+#include "../include/disk.h"
 
 void kernel_main() {
     clear_screen();
+
+    print_string("Initializing EXT2 Filesystem.\n");
+    kernel_disk_init();
+
     print_string("Installing interrupt service routines (ISRs).\n");
     isr_install();
 
